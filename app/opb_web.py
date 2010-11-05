@@ -107,5 +107,5 @@ class favicon_serve:
 		raise web.redirect( '/static/favicon.ico' )
 
 if __name__ == "__main__" :
-	SetTheme( 'default' )
+	SetTheme( 'limelight' )
 	app.run()
