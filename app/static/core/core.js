@@ -1,8 +1,8 @@
 $( document ).ready(
 	function () {
-		$( document ).keypress( function ( e ) { Hook.call( 'core.onKeyPress', [ e ] ); } );
-		Hook.call( 'core.onLoad', [] );
-		$( window ).unload( function () { Hook.call( 'core.onUnLoad', [] ); } );
+		$( document ).keypress( function ( e ) { OPBConfig.onKeyPress( e ); } );
+		OPBConfig.onLoad();
+		$( window ).unload( function () { OPBConfig.onUnload() } );
 	}
 );
 
@@ -13,9 +13,6 @@ OpenPhotoBooth = {
 	captureCallback: function ( imageData ) {
 		OpenPhotoBooth.capturePending = false;
 
-		hookArguments = []
-		Hook.call( 'core.preImagePost', hookArguments );
-
 		jQuery.ajax(
       {
 			 url: "/photo",
@@ -23,8 +20,8 @@ OpenPhotoBooth = {
 			 cache: false,
 			 async: false,
 			 type: "POST",
-			 data: { image: imageData, hooks: hookArguments },
-			 success: function ( data ) { Hook.call( 'core.postCapture', [ data ] ); }
+			 data: { image: imageData },
+			 success: function ( data ) { OPBConfig.postCapture( data ); }
 		  }
     );
 
@@ -35,7 +32,7 @@ OpenPhotoBooth = {
 		if( OpenPhotoBooth.capturePending )
 			return false;
 
-		Hook.call( 'core.preCapture', [] );
+		OPBConfig.preCapture();
 
 		OpenPhotoBooth.capturePending = true;
 
@@ -47,35 +44,25 @@ OpenPhotoBooth = {
 	},
 
 	openSet: function () {
-
-		hookArguments = []
-		Hook.call( 'core.preOpenSet', hookArguments );
-
 		jQuery.ajax(
 			{
 				url: "/set/open",
 				dataType: 'json',
 				cache: false,
 				async: false,
-				data: { hooks: hookArguments },
-				success: function ( data ) { Hook.call( 'core.postOpenSet', [ data ] ); }
+				data: {}
 		  }
 		);
 	},
 
 	closeSet: function () {
-
-		hookArguments = []
-		Hook.call( 'core.preCloseSet', hookArguments );
-
 		jQuery.ajax(
 			{
 				url: "/set/close",
 				dataType: 'json',
 				cache: false,
 				async: false,
-				data: { hooks: hookArguments },
-				success: function ( data ) { Hook.call( 'core.postCloseSet', [ data ] ); }
+				data: {}
 		  }
 		);
 	}
