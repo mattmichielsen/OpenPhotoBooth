@@ -3,10 +3,6 @@ $( document ).ready(
 		$( document ).keypress( function ( e ) { OPBConfig.onKeyPress( e ); } );
 		OPBConfig.onLoad();
 		$( window ).unload( function () { OPBConfig.onUnload() } );
-		jQuery('#trigger').click( function (e) {
-			alert('trigger');
-			OPBSkin.startCapture(e); 
-		} );
 	}
 );
 

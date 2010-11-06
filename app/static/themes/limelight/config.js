@@ -3,7 +3,9 @@ OPBConfig = {
 	// To do on loading (dom complete)
 	onLoad : function () {
 		OpenPhotoBooth.openSet();
-		jQuery('#trigger').click( function (e) { OPBSkin.startCapture(e); } );
+		jQuery( '#countdown' ).click(function(e) {
+			OPBSkin.startCapture();
+		});
 	},
 
 	onUnload: function () {
@@ -16,7 +18,6 @@ OPBConfig = {
 
 	// Fired immediately before a capture request is sent to the SWF
 	preCapture : function () {
-		OPBSkin.shutter.play();
 	},
 
 	// Fired immediately after a capture is returned from the SWF and POSTed to the server
@@ -36,10 +37,6 @@ OPBConfig = {
 
 	// Fired when a key is pressed
 	onKeyPress: function (e) {
-		if( false && e.which == 99 && ! OPBSkin.inSet ) {
-			OPBSkin.inSet = true;
-			OPBSkin.countDown( 6, 1000 );
-		}
 	}
 };
 
@@ -69,12 +66,12 @@ OPBSkin = {
 
 	reset: function () {
 	 OPBSkin.captured = 0;
-	 $( "#countdown" ).text( "Amee's birthday photo booth" );
+	 $( "#countdown" ).text( "Touch here to start" );
 	 OPBSkin.inSet = false;
 	 for( i = 1; i <= 4; ++i ) { $( "#photo" + i ).attr( "src", OPBSkinPath + "set" + i + ".jpg"); }
-	}
+	},
 
-	startCapture: function(e) {
+	startCapture: function() {
                 OPBSkin.inSet = true;
                 OPBSkin.countDown (6, 1000);
         }
