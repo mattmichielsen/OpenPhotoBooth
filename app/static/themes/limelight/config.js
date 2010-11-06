@@ -3,6 +3,7 @@ OPBConfig = {
 	// To do on loading (dom complete)
 	onLoad : function () {
 		OpenPhotoBooth.openSet();
+		jQuery('#trigger').click( function (e) { OPBSkin.startCapture(e); } );
 	},
 
 	onUnload: function () {
@@ -39,7 +40,7 @@ OPBConfig = {
 			OPBSkin.inSet = true;
 			OPBSkin.countDown( 6, 1000 );
 		}
-	},
+	}
 };
 
 /* OPBSkin is a place to safely store functions for just your skin */
@@ -61,7 +62,6 @@ OPBSkin = {
 			setTimeout( "OpenPhotoBooth.capture();", 200 );
 		}
 		else {
-			OPBSkin.beep.play();
 			$( "#countdown" ).text( count );
 			setTimeout("OPBSkin.countDown("+count+","+interval+");",interval);
 		}
@@ -74,8 +74,8 @@ OPBSkin = {
 	 for( i = 1; i <= 4; ++i ) { $( "#photo" + i ).attr( "src", OPBSkinPath + "set" + i + ".jpg"); }
 	}
 
-	function startCapture() {
-		OPBSkin.inSet = true;
-		OPBSkin.countDown (6, 1000);
-	}
-}
+	startCapture: function(e) {
+                OPBSkin.inSet = true;
+                OPBSkin.countDown (6, 1000);
+        }
+};

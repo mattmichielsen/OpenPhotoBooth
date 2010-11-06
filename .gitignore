@@ -1,1 +1,3 @@
 *.pyc
+app/static/photos/*
+app/static/thumbs/*
