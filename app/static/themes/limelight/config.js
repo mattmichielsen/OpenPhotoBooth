@@ -11,14 +11,6 @@ OPBConfig = {
 
 	// Fired when Sound Manager 2 is loaded & ready
 	onSoundLoad: function () {
-		OPBSkin.shutter = soundManager.createSound( {
-			id: 'shutterSound',
-			url: OPBSkinPath + 'shutter-short.mp3'
-		} );
-		OPBSkin.beep = soundManager.createSound( {
-			id: 'beep',
-			url: OPBSkinPath + 'beep.mp3'
-		} );
 	},
 
 	// Fired immediately before a capture request is sent to the SWF
@@ -43,7 +35,7 @@ OPBConfig = {
 
 	// Fired when a key is pressed
 	onKeyPress: function (e) {
-		if( e.which == 99 && ! OPBSkin.inSet ) {
+		if( false && e.which == 99 && ! OPBSkin.inSet ) {
 			OPBSkin.inSet = true;
 			OPBSkin.countDown( 6, 1000 );
 		}
@@ -77,8 +69,13 @@ OPBSkin = {
 
 	reset: function () {
 	 OPBSkin.captured = 0;
-	 $( "#countdown" ).text( "Welcome To OpenPhotoBooth!" );
+	 $( "#countdown" ).text( "Amee's birthday photo booth" );
 	 OPBSkin.inSet = false;
 	 for( i = 1; i <= 4; ++i ) { $( "#photo" + i ).attr( "src", OPBSkinPath + "set" + i + ".jpg"); }
+	}
+
+	function startCapture() {
+		OPBSkin.inSet = true;
+		OPBSkin.countDown (6, 1000);
 	}
 }
