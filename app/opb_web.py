@@ -26,6 +26,7 @@ import web
 import Image
 import base64
 import time
+from subprocess import call
 
 web.config.debug = False
 
@@ -34,7 +35,8 @@ urls = (
 	'/set/open', 'open_set',
 	'/set/close', 'close_set',
 	'/photo', 'save_photo',
-  '/favicon.ico', 'favicon_serve'
+	'/trigger_gphoto2', 'trigger_gphoto2',
+	'/favicon.ico', 'favicon_serve'
 )
 
 # Need a render engine for the core template files
@@ -89,6 +91,12 @@ class save_photo:
 		im.thumbnail( size )
 		im.save( './static/thumbs/' + filename, "JPEG" )
 		return '{ "saved": true, "thumbnail": "%s" }' % ( filename )
+
+class trigger_gphoto2:
+	def POST( self ):
+		global set_id
+		
+		call(['gphoto2', '--capture-image-and-download'])
 
 class open_set:
 	def GET ( self ):

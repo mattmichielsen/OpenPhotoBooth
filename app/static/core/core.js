@@ -9,6 +9,7 @@ $( document ).ready(
 OpenPhotoBooth = {
 
 	capturePending: false,
+	enableGphoto2: false;
 
 	captureCallback: function ( imageData ) {
 		OpenPhotoBooth.capturePending = false;
@@ -35,6 +36,15 @@ OpenPhotoBooth = {
 		OPBConfig.preCapture();
 
 		OpenPhotoBooth.capturePending = true;
+		if( enableGphoto2 )
+		{
+			jQuery.ajax(
+			{
+				url: "/trigger_gphoto2",
+				async: false,
+				type: "POST"
+			}
+		}
 
 		// TEST: Cross browser working?
 		if( $.browser.msie )

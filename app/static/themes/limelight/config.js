@@ -6,6 +6,7 @@ OPBConfig = {
 		jQuery( '#countdown' ).click(function(e) {
 			OPBSkin.startCapture();
 		});
+		OpenPhotoBooth.enableGphoto2 = true;
 	},
 
 	onUnload: function () {
