@@ -35,7 +35,6 @@ urls = (
 	'/set/open', 'open_set',
 	'/set/close', 'close_set',
 	'/photo', 'save_photo',
-	'/trigger_gphoto2', 'trigger_gphoto2',
 	'/favicon.ico', 'favicon_serve'
 )
 
@@ -54,6 +53,7 @@ opb = {
 
 theme_render = None
 set_id = False
+enableGphoto2 = True
 
 # Sets everything required for properly rendering a theme
 def SetTheme ( theme_name ):
@@ -82,21 +82,18 @@ class save_photo:
 		else:
 			filename = "NOSET_%s.jpg" % ( int( time.time() ) )
 
-		fullsize = open( './static/photos/' + filename, 'wb' )
-		fullsize.write( base64.standard_b64decode( i.image ) )
-		fullsize.close()
+		if (enableGphoto2):
+			call(['gphoto2', '--capture-image-and-download', '--filename=./static/photos/%s' % filename])
+		else:
+			fullsize = open( './static/photos/' + filename, 'wb' )
+			fullsize.write( base64.standard_b64decode( i.image ) )
+			fullsize.close()
 
 		size = 160, 120
 		im = Image.open( './static/photos/' + filename )
 		im.thumbnail( size )
 		im.save( './static/thumbs/' + filename, "JPEG" )
 		return '{ "saved": true, "thumbnail": "%s" }' % ( filename )
-
-class trigger_gphoto2:
-	def POST( self ):
-		global set_id
-		
-		call(['gphoto2', '--capture-image-and-download'])
 
 class open_set:
 	def GET ( self ):

@@ -6,7 +6,6 @@ OPBConfig = {
 		jQuery( '#countdown' ).click(function(e) {
 			OPBSkin.startCapture();
 		});
-		OpenPhotoBooth.enableGphoto2 = true;
 	},
 
 	onUnload: function () {
@@ -33,7 +32,7 @@ OPBConfig = {
 			setTimeout( "OPBSkin.reset();", 5000 );
 		}
 		else
-			setTimeout( "OPBSkin.countDown( 6, 1000 );", 1000 );
+			setTimeout( "OPBSkin.countDown( 4, 1000 );", 1000 );
 	},
 
 	// Fired when a key is pressed
@@ -57,7 +56,7 @@ OPBSkin = {
 		--count;
 		if(count == 0) {
 			$( "#countdown" ).text( "Smile!" );
-			setTimeout( "OpenPhotoBooth.capture();", 200 );
+			setTimeout( "OpenPhotoBooth.capture();", 10 );
 		}
 		else {
 			$( "#countdown" ).text( count );
