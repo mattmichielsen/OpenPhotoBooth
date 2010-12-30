@@ -75,8 +75,6 @@ class save_photo:
 		web.header( 'Content-type', 'application/json; charset=utf-8' )
 
 		""" Save the photo data, thumbnail it and move on. """
-		i = web.input( image=None )
-
 		if False != set_id:
 			filename = "%s_%s.jpg" % ( set_id, int( time.time() ) )
 		else:
@@ -85,6 +83,8 @@ class save_photo:
 		if (enableGphoto2):
 			call(['gphoto2', '--capture-image-and-download', '--filename=./static/photos/%s' % filename])
 		else:
+			i = web.input( image=None )
+
 			fullsize = open( './static/photos/' + filename, 'wb' )
 			fullsize.write( base64.standard_b64decode( i.image ) )
 			fullsize.close()

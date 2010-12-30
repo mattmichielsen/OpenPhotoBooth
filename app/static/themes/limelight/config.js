@@ -1,5 +1,7 @@
 /* OPBConfig is for all the hooks that the core.js calls */
 OPBConfig = {
+	enableGphoto2: true,
+
 	// To do on loading (dom complete)
 	onLoad : function () {
 		OpenPhotoBooth.openSet();

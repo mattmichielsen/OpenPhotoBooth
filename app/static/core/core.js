@@ -14,7 +14,7 @@ OpenPhotoBooth = {
 		OpenPhotoBooth.capturePending = false;
 
 		jQuery.ajax(
-      {
+		{
 			 url: "/photo",
 			 dataType: 'json',
 			 cache: false,
@@ -33,14 +33,21 @@ OpenPhotoBooth = {
 			return false;
 
 		OPBConfig.preCapture();
-
+		
 		OpenPhotoBooth.capturePending = true;
 
-		// TEST: Cross browser working?
-		if( $.browser.msie )
-			document.getElementById("swf-object").capture();
+		if (OPBConfig.enableGphoto2)
+		{
+			OpenPhotoBooth.captureCallback(null);
+		}
 		else
-			document.getElementById("swf-embed").capture();
+		{
+			// TEST: Cross browser working?
+			if( $.browser.msie )
+				document.getElementById("swf-object").capture();
+			else
+				document.getElementById("swf-embed").capture();
+		}
 	},
 
 	openSet: function () {
@@ -66,5 +73,4 @@ OpenPhotoBooth = {
 		  }
 		);
 	}
-
 }
