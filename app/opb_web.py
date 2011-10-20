@@ -56,7 +56,7 @@ opb = {
 theme_render = None
 set_id = False
 enableGphoto2 = True
-enablePrinter = True
+enablePrinter = False
 
 # Sets everything required for properly rendering a theme
 def SetTheme ( theme_name ):
@@ -119,7 +119,7 @@ class close_set:
                 for filename in glob.glob('./static/photos/%s_*.jpg' % set_id):
                 	images.append(Image.open(filename).resize((1000, 750)))
 
-                if len(images) = 4:
+                if len(images) == 4:
                         im.paste(images[0], (0, 0))
 			im.paste(images[1], (1000, 0))
 			im.paste(images[2], (0, 750))
