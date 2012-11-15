@@ -30,6 +30,7 @@ from subprocess import call
 import glob
 import os
 import mimetypes
+import ConfigParser
 
 mimetypes.init()
 
@@ -59,10 +60,13 @@ opb = {
   'thumb_path': '/static/thumbs/'
 }
 
+config = ConfigParser.ConfigParser()
+config.read('config.ini')
+
 theme_render = None
 set_id = False
-enableGphoto2 = True
-enablePrinter = False
+enableGphoto2 = config.getboolean("Features", "EnableExternalCamera")
+enablePrinter = config.getboolean("Features", "EnablePrinter")
 
 ##### Load Plugins
 requested_plugins = [ 'hello_world', ]
