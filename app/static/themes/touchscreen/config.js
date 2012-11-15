@@ -1,6 +1,6 @@
 /* OPBConfig is for all the hooks that the core.js calls */
 OPBConfig = {
-	enableGphoto2: true,
+	enableGphoto2: false,
 
 	// To do on loading (dom complete)
 	onLoad : function () {
