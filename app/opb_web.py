@@ -34,7 +34,6 @@ import ConfigParser
 
 mimetypes.init()
 
-
 web.config.debug = False
 
 urls = [
@@ -60,13 +59,19 @@ opb = {
   'thumb_path': '/static/thumbs/'
 }
 
-config = ConfigParser.ConfigParser()
+config = ConfigParser.SafeConfigParser({'EnableExternalCamera': False, 'EnablePrinter': False, 'Rows': 4, 'Columns': 1, 'SetsPerPage': 4, 'ImageSizeX': 1000, 'ImageSizeY': 750, 'FooterImage': ''})
 config.read('config.ini')
 
 theme_render = None
 set_id = False
 enableGphoto2 = config.getboolean("Features", "EnableExternalCamera")
 enablePrinter = config.getboolean("Features", "EnablePrinter")
+printerRows = config.getint("Printing", "Rows")
+printerColumns = config.getint("Printing", "Columns")
+printerSetsPerPage = config.getint("Printing", "SetsPerPage")
+printerImageSizeX = config.getint("Printing", "ImageSizeX")
+printerImageSizeY = config.getint("Printing", "ImageSizeY")
+printerFooterImage = config.get("Printing", "FooterImage")
 
 ##### Load Plugins
 requested_plugins = [ 'hello_world', ]
@@ -83,6 +88,35 @@ def SetTheme ( theme_name ):
 	global opb
 	opb['theme_path'] = '/static/themes/%s/' % ( theme_name )
 	theme_render = web.template.render( 'static/themes/%s/' % ( theme_name ) )
+
+def printImage(set_id):
+  images = list()
+  printerFooterSizeX = 0
+  printerFooterSizeY = 0
+
+  imageSize = printerImageSizeX, printerImageSizeY
+
+  if printerFooterImage:
+    footer = Image.open('./static/photos/%s' % printerFooterImage)
+    footer.thumbnail(imageSize, Image.ANTIALIAS)
+    printerFooterSizeX, printerFooterSizeY = footer.size
+
+  im = Image.new("RGB", (printerImageSizeX * printerColumns, printerImageSizeY * printerRows + printerFooterSizeY))
+  for filename in glob.glob('./static/photos/%s_*.jpg' % set_id):
+    image = Image.open(filename)
+    image.thumbnail(imageSize, Image.ANTIALIAS)
+    images.append(image)
+
+  if len(images) == 4:
+    im.paste(images[0], (0, 0))
+    im.paste(images[1], (0, printerImageSizeY))
+    im.paste(images[2], (0, printerImageSizeY * 2))
+    im.paste(images[3], (0, printerImageSizeY * 3))
+    if footer:
+      im.paste(footer, (0, printerImageSizeY * 4))
+    im.save('./static/photos/%s_print.jpg' % set_id)
+		
+  return
 
 # Create the application
 app = web.application( tuple( urls ), globals() )
@@ -155,28 +189,13 @@ class open_set:
 		return '{ "set": "%s" }' % set_id
 
 class close_set:
-	def GET ( self ):
-		global set_id
-		if enablePrinter:
-			printImage(set_id)
+  def GET ( self ):
+    global set_id
+    if enablePrinter:
+      printImage(set_id)
 
-		set_id = False
-		return '{ "set": false }'
-
-	def printImage(set_id):
-		images = list()
-                im = Image.new("RGB", (2000, 1500))
-                for filename in glob.glob('./static/photos/%s_*.jpg' % set_id):
-                	images.append(Image.open(filename).resize((1000, 750)))
-
-                if len(images) == 4:
-                        im.paste(images[0], (0, 0))
-			im.paste(images[1], (1000, 0))
-			im.paste(images[2], (0, 750))
-			im.paste(images[3], (1000, 750))
-			im.save('./static/photos/%s_print.jpg' % set_id)
-		
-		return
+    set_id = False
+    return '{ "set": false }'
 
 class favicon_serve:
 	def GET ( self ):
