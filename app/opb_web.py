@@ -31,6 +31,10 @@ import glob
 import os
 import mimetypes
 import ConfigParser
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.lib.units import inch
+from reportlab.lib.utils import ImageReader
 
 mimetypes.init()
 
@@ -64,6 +68,7 @@ config.read('config.ini')
 
 theme_render = None
 set_id = False
+printQueue = []
 enableGphoto2 = config.getboolean("Features", "EnableExternalCamera")
 enablePrinter = config.getboolean("Features", "EnablePrinter")
 printerRows = config.getint("Printing", "Rows")
@@ -93,6 +98,8 @@ def printImage(set_id):
   images = list()
   printerFooterSizeX = 0
   printerFooterSizeY = 0
+  actualImageSizeX = 0
+  actualImageSizeY = 0
 
   imageSize = printerImageSizeX, printerImageSizeY
 
@@ -101,21 +108,48 @@ def printImage(set_id):
     footer.thumbnail(imageSize, Image.ANTIALIAS)
     printerFooterSizeX, printerFooterSizeY = footer.size
 
-  im = Image.new("RGB", (printerImageSizeX * printerColumns, printerImageSizeY * printerRows + printerFooterSizeY))
   for filename in glob.glob('./static/photos/%s_*.jpg' % set_id):
     image = Image.open(filename)
     image.thumbnail(imageSize, Image.ANTIALIAS)
+    actualImageSizeX, actualImageSizeY = image.size
     images.append(image)
 
-  if len(images) == 4:
-    im.paste(images[0], (0, 0))
-    im.paste(images[1], (0, printerImageSizeY))
-    im.paste(images[2], (0, printerImageSizeY * 2))
-    im.paste(images[3], (0, printerImageSizeY * 3))
-    if footer:
-      im.paste(footer, (0, printerImageSizeY * 4))
-    im.save('./static/photos/%s_print.jpg' % set_id)
-		
+  if actualImageSizeX > 0:
+    im = Image.new("RGB", (actualImageSizeX * printerColumns, actualImageSizeY * printerRows + printerFooterSizeY))
+
+    if len(images) == 4:
+      im.paste(images[0], (0, 0))
+      im.paste(images[1], (0, actualImageSizeY))
+      im.paste(images[2], (0, actualImageSizeY * 2))
+      im.paste(images[3], (0, actualImageSizeY * 3))
+      if footer:
+        im.paste(footer, (0, actualImageSizeY * 4))
+
+      im = im.rotate(90)
+      fileName = './static/photos/%s_print.jpg' % set_id
+      im.save(fileName)
+      addToPrintQueue(fileName)
+
+  return
+
+def addToPrintQueue(fileName):
+  global printQueue
+  printQueue.append(fileName)
+  if len(printQueue) >= printerSetsPerPage:
+    printFileName = './static/photos/%s_to_print.pdf' % int( time.time() )
+    printCanvas = canvas.Canvas(printFileName, pagesize=letter)
+    width, height = letter
+    #stripsize = int(height * inch/ printerSetsPerPage), int(width * inch)
+    for idx, file in enumerate(printQueue):
+      image = ImageReader(file)
+      printCanvas.drawImage(image, 0.25 * inch, (idx * 2.70 * inch) - (5.5 * inch), width=8 * inch, preserveAspectRatio=True)
+
+    printCanvas.save()
+
+    call(['lpr', printFileName])
+
+    printQueue = []
+
   return
 
 # Create the application
