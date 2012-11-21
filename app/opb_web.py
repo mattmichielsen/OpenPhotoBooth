@@ -128,21 +128,24 @@ def printImage(set_id):
       im = im.rotate(90)
       fileName = './static/photos/%s_print.jpg' % set_id
       im.save(fileName)
-      addToPrintQueue(fileName)
 
+      addToPrintQueue(fileName)
+      addToPrintQueue(fileName)
+      addToPrintQueue(fileName)
+      addToPrintQueue(fileName)
   return
 
 def addToPrintQueue(fileName):
   global printQueue
   printQueue.append(fileName)
-  if len(printQueue) >= printerSetsPerPage:
+  if len(printQueue) >= 4:
     printFileName = './static/photos/%s_to_print.pdf' % int( time.time() )
     printCanvas = canvas.Canvas(printFileName, pagesize=letter)
     width, height = letter
     #stripsize = int(height * inch/ printerSetsPerPage), int(width * inch)
     for idx, file in enumerate(printQueue):
       image = ImageReader(file)
-      printCanvas.drawImage(image, 0.25 * inch, (idx * 2.70 * inch) - (5.5 * inch), width=8 * inch, preserveAspectRatio=True)
+      printCanvas.drawImage(image, 0.25 * inch, (idx * 2.60 * inch) - (4.25 * inch), width=8 * inch, preserveAspectRatio=True)
 
     printCanvas.save()
 
