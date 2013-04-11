@@ -29,12 +29,14 @@ import time
 from subprocess import call
 import glob
 import os
+import os.path
 import mimetypes
 import ConfigParser
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.lib.units import inch
 from reportlab.lib.utils import ImageReader
+import urllib
 
 mimetypes.init()
 
@@ -70,6 +72,7 @@ theme_render = None
 set_id = False
 printQueue = []
 enableGphoto2 = config.getboolean("Features", "EnableExternalCamera")
+enableMjpgStreamer = config.getboolean("Features", "EnableMjpgStreamer")
 enablePrinter = config.getboolean("Features", "EnablePrinter")
 printerRows = config.getint("Printing", "Rows")
 printerColumns = config.getint("Printing", "Columns")
@@ -96,6 +99,7 @@ def SetTheme ( theme_name ):
 
 def printImage(set_id):
   images = list()
+  footer = False
   printerFooterSizeX = 0
   printerFooterSizeY = 0
   actualImageSizeX = 0
@@ -104,9 +108,11 @@ def printImage(set_id):
   imageSize = printerImageSizeX, printerImageSizeY
 
   if printerFooterImage:
-    footer = Image.open('./static/photos/%s' % printerFooterImage)
-    footer.thumbnail(imageSize, Image.ANTIALIAS)
-    printerFooterSizeX, printerFooterSizeY = footer.size
+    footerFileName = './static/photos/%s' % printerFooterImage
+    if os.path.isfile(footerFileName):
+      footer = Image.open(footerFileName)
+      footer.thumbnail(imageSize, Image.ANTIALIAS)
+      printerFooterSizeX, printerFooterSizeY = footer.size
 
   for filename in glob.glob('./static/photos/%s_*.jpg' % set_id):
     image = Image.open(filename)
@@ -194,30 +200,31 @@ class plugin_serve:
 			app.notfound()
 
 class save_photo:
-	def POST( self ):
-		global set_id
-		web.header( 'Content-type', 'application/json; charset=utf-8' )
+  def POST( self ):
+    global set_id
+    web.header( 'Content-type', 'application/json; charset=utf-8' )
 
-		""" Save the photo data, thumbnail it and move on. """
-		if False != set_id:
-			filename = "%s_%s.jpg" % ( set_id, int( time.time() ) )
-		else:
-			filename = "NOSET_%s.jpg" % ( int( time.time() ) )
+    """ Save the photo data, thumbnail it and move on. """
+    if False != set_id:
+      filename = "%s_%s.jpg" % ( set_id, int( time.time() ) )
+    else:
+      filename = "NOSET_%s.jpg" % ( int( time.time() ) )
 
-		if (enableGphoto2):
-			call(['gphoto2', '--capture-image-and-download', '--filename=./static/photos/%s' % filename])
-		else:
-			i = web.input( image=None )
+    if enableGphoto2:
+      call(['gphoto2', '--capture-image-and-download', '--filename=./static/photos/%s' % filename])
+    elif enableMjpgStreamer:
+      urllib.urlretrieve("http://localhost:8081/?action=snapshot", './static/photos/%s' % filename)
+    else:
+      i = web.input( image=None )
+      fullsize = open( './static/photos/' + filename, 'wb' )
+      fullsize.write( base64.standard_b64decode( i.image ) )
+      fullsize.close()
 
-			fullsize = open( './static/photos/' + filename, 'wb' )
-			fullsize.write( base64.standard_b64decode( i.image ) )
-			fullsize.close()
-
-		size = 160, 120
-		im = Image.open( './static/photos/' + filename )
-		im.thumbnail( size )
-		im.save( './static/thumbs/' + filename, "JPEG" )
-		return '{ "saved": true, "thumbnail": "%s" }' % ( filename )
+    size = 160, 120
+    im = Image.open( './static/photos/' + filename )
+    im.thumbnail( size )
+    im.save( './static/thumbs/' + filename, "JPEG" )
+    return '{ "saved": true, "thumbnail": "%s" }' % ( filename )
 
 class open_set:
 	def GET ( self ):

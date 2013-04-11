@@ -36,7 +36,7 @@ OpenPhotoBooth = {
 		
 		OpenPhotoBooth.capturePending = true;
 
-		if (OPBConfig.enableGphoto2)
+		if (OPBConfig.enableCallback)
 		{
 			OpenPhotoBooth.captureCallback(null);
 		}
