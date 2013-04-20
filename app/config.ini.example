@@ -1,0 +1,12 @@
+[Features]
+EnableExternalCamera: False
+EnableMjpgStreamer: True
+EnablePrinter: False
+
+[Printing]
+Rows: 4
+Columns: 1
+SetsPerPage: 4
+ImageSizeX: 1000
+ImageSizeY: 750
+FooterImage: footer.jpg
